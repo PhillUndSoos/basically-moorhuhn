@@ -44,6 +44,8 @@ class Raven {
 
         //increases the vertical length of the curve 
         this.curve = Math.random() * 8
+
+        this.markedForDeletion = false;
     }
 
     //moves the sprite
@@ -53,6 +55,8 @@ class Raven {
         this.y += this.curve * Math.sin(this.angle)
         //sets the angle of the sinus wave, the higher the speed, the higher the angle
         this.angle += this.angleSpeed;
+
+        if (this.x < 0 - this.width) this.markedForDeletion = true;
     }
 
     draw(){
@@ -81,6 +85,10 @@ function animate(timeStamp) {
     [...ravens].forEach(obj => obj.update());
     // we use this syntax to make a shallow copy of the ravens array, this array is not affected by changes made to 'ravens'
     [...ravens].forEach(obj => obj.draw());
+
+    //deletes ravens outside of screen it markedfordeletion evaluates to false (double negative statement)
+    ravens = ravens.filter(obj => !obj.markedForDeletion);
+    
     raven.update();
     raven.draw();
 
