@@ -24,8 +24,14 @@ let ravens = [];
 
 class Raven {
     constructor() {
-        this.width = 100;
-        this.height = 50;
+        //these image propertys are declared here, to have them ready to use 
+        this.spriteWidth = 271;
+        this.spriteHeight = 194;
+
+        this.sizeModifier = Math.random() * 0.6 + 0.4
+
+        this.width = this.spriteWidth * this.sizeModifier;
+        this.height = this.spriteHeight * this.sizeModifier;
 
         this.x = canvas.width;
         //random vertical position on canvas
@@ -43,24 +49,59 @@ class Raven {
         this.angleSpeed = Math.random() * 0.2;
 
         //increases the vertical length of the curve 
-        this.curve = Math.random() * 8
+        this.curve = Math.random() * 8;
 
         this.markedForDeletion = false;
+
+        
+        this.animationFrame = 0;
+
+        //max frames until reset
+        this.maxAnimationFrame = 4;
+
+        this.image = new Image();
+        this.image.src = './media/images/raven.png';
+        
+        //animation speed
+        this.timeSinceFlap = 0;
+        this.flapInterval = 75;
+
     }
 
     //moves the sprite
-    update() {
+    update(deltaTime) {
+        //prevvents ravens from leaving the page
+        if (this.y < 0 || this.y > canvas.height - this.height) {
+            this.directionY *= -1
+            if (this.y > canvas.height - this.height) {
+                this.directionY = 0;
+                this.y = canvas.height - this.height;
+            }
+        } else {
+            // makes vertical movement a sinus wave 
+            this.y += this.curve * Math.sin(this.angle);
+        }
+
         this.x -= this.directionX;
-        // makes vertical movement a sinus wave 
-        this.y += this.curve * Math.sin(this.angle)
+        
         //sets the angle of the sinus wave, the higher the speed, the higher the angle
         this.angle += this.angleSpeed;
 
         if (this.x < 0 - this.width) this.markedForDeletion = true;
+
+        this.timeSinceFlap += deltaTime;
+
+        if (this.timeSinceFlap > this.flapInterval){
+            if (this.animationFrame > this.maxAnimationFrame) this.animationFrame = 0;
+            else this.animationFrame++;
+            this.timeSinceFlap = 0;
+        }
+        
     }
 
     draw(){
-        ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.strokeRect(this.x, this.y, this.width, this.height);
+        ctx.drawImage(this.image, this.animationFrame * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, this.x, this.y, this.width, this.height)
     }
 }
 
@@ -82,17 +123,14 @@ function animate(timeStamp) {
         timeToNextRaven = 0;
     };
     // [] <-- this is an array literal, the 3 dots are a spread operator. https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax 
-    [...ravens].forEach(obj => obj.update());
+    [...ravens].forEach(obj => obj.update(deltaTime));
     // we use this syntax to make a shallow copy of the ravens array, this array is not affected by changes made to 'ravens'
     [...ravens].forEach(obj => obj.draw());
 
     //deletes ravens outside of screen it markedfordeletion evaluates to false (double negative statement)
     ravens = ravens.filter(obj => !obj.markedForDeletion);
-    
-    raven.update();
-    raven.draw();
-
     requestAnimationFrame(animate);
 }
+
 
 animate(0)
