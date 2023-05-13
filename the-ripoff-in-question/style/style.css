@@ -1,10 +1,10 @@
 body {
-  /* background: linear-gradient(
+  background: linear-gradient(
     to bottom,
     red,
     green,
     blue
-  ); this will definetly be changes lol */
+  ); /*this will definetly be changes lol*/
   width: 100vw;
   height: 100vh;
   overflow: hidden;
@@ -19,5 +19,5 @@ canvas {
 }
 
 #hitboxCanvas {
-  background: red;
+  opacity: 0;
 }

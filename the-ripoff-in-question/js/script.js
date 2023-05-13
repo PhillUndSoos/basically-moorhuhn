@@ -130,7 +130,18 @@ function drawScore() {
 window.addEventListener('click', function (e) {
     const detectPixelColor = hitboxCtx.getImageData(e.x, e.y, 1, 1);
     console.log(detectPixelColor);
-})
+    const pixelColor = detectPixelColor.data;
+    ravens.forEach(obj => {
+        if (obj.randColors[0] === pixelColor[0] &&
+            obj.randColors[1] === pixelColor[1] &&
+            obj.randColors[2] === pixelColor[2]) {
+            obj.markedForDeletion = true;
+            score++;
+            console.log('YOU HIT!')
+        }
+    });
+    console.log('pixelColor: ' + pixelColor)
+});
 
 
 //timeStamp value counted in milliseconds, used to base speed on the same value, no matter the PC power
@@ -163,7 +174,7 @@ function animate(timeStamp) {
     //deletes ravens outside of screen it markedfordeletion evaluates to false (double negative statement)
     ravens = ravens.filter(obj => !obj.markedForDeletion);
     requestAnimationFrame(animate);
-    console.log(ravens)
+    console.log(ravens.randColors)
 }
 
 
