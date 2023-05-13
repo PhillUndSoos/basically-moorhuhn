@@ -177,5 +177,4 @@ function animate(timeStamp) {
     console.log(ravens.randColors)
 }
 
-
 animate(0)
