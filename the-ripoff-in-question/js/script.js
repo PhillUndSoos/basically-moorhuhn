@@ -14,6 +14,16 @@ const ctx = canvas.getContext('2d')
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+const hitboxCanvas = document.getElementById('hitboxCanvas')
+const hitboxCtx = hitboxCanvas.getContext('2d')
+hitboxCanvas.width = window.innerWidth;
+hitboxCanvas.height = window.innerHeight;
+
+
+let score = 0;
+ctx.font = '50px Impact'
+
+
 let timeToNextRaven = 0;
 //sets raven spawnrate
 let ravenInterval = 500;
@@ -64,10 +74,14 @@ class Raven {
         
         //animation speed
         this.timeSinceFlap = 0;
-        this.flapInterval = 75;
+        this.flapInterval = 75; 
+        
+        //Random RGB value between 1 and 255, creating different colored rectangles for each raven to use as hitboxes
+        this.randColors = [Math.floor(Math.random() * 255), Math.floor(Math.random() * 255), Math.floor(Math.random() * 255)]
+        this.color = `rgb(${this.randColors[0]},${this.randColors[1]},${this.randColors[2]})`
 
     }
-
+    
     //moves the sprite
     update(deltaTime) {
         //prevvents ravens from leaving the page
@@ -99,18 +113,41 @@ class Raven {
         
     }
 
-    draw(){
-        ctx.strokeRect(this.x, this.y, this.width, this.height);
+    draw() {
+        hitboxCtx.fillStyle = this.color;
+        hitboxCtx.fillRect(this.x, this.y, this.width, this.height);
         ctx.drawImage(this.image, this.animationFrame * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, this.x, this.y, this.width, this.height)
     }
 }
 
-const raven = new Raven()
+function drawScore() {
+    ctx.fillStyle = 'black';
+    ctx.fillText('Score: ' + score, 46, 74);
+    ctx.fillStyle = 'white';
+    ctx.fillText('Score: ' + score, 50, 75);
+}
+
+window.addEventListener('click', function (e) {
+    const detectPixelColor = hitboxCtx.getImageData(e.x, e.y, 1, 1);
+    console.log(detectPixelColor);
+    const pixelColor = detectPixelColor.data;
+    ravens.forEach(obj => {
+        if (obj.randColors[0] === pixelColor[0] &&
+            obj.randColors[1] === pixelColor[1] &&
+            obj.randColors[2] === pixelColor[2]) {
+            obj.markedForDeletion = true;
+            score++;
+            console.log('YOU HIT!')
+        }
+    });
+    console.log('pixelColor: ' + pixelColor)
+});
 
 
 //timeStamp value counted in milliseconds, used to base speed on the same value, no matter the PC power
 function animate(timeStamp) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    hitboxCtx.clearRect(0, 0, canvas.width, canvas.height);
     //deltaTime contains the time difference between the beginning of the previous frame and the beginning of the current frame in milliseconds.
     let deltaTime = timeStamp - lastTime;
     lastTime = timeStamp;
@@ -121,7 +158,14 @@ function animate(timeStamp) {
     if (timeToNextRaven > ravenInterval) {
         ravens.push(new Raven());
         timeToNextRaven = 0;
+        //sorts ravens in array by size, to create depth
+        ravens.sort(function (a, b) {
+            return a.width - b.width;
+        })
     };
+
+    drawScore();
+
     // [] <-- this is an array literal, the 3 dots are a spread operator. https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax 
     [...ravens].forEach(obj => obj.update(deltaTime));
     // we use this syntax to make a shallow copy of the ravens array, this array is not affected by changes made to 'ravens'
@@ -130,7 +174,7 @@ function animate(timeStamp) {
     //deletes ravens outside of screen it markedfordeletion evaluates to false (double negative statement)
     ravens = ravens.filter(obj => !obj.markedForDeletion);
     requestAnimationFrame(animate);
+    console.log(ravens.randColors)
 }
-
 
 animate(0)
