@@ -82,6 +82,7 @@ class Raven {
 
     }
     
+    
     //moves the sprite
     update(deltaTime) {
         //prevvents ravens from leaving the page
@@ -119,6 +120,21 @@ class Raven {
         ctx.drawImage(this.image, this.animationFrame * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, this.x, this.y, this.width, this.height)
     }
 }
+
+//hold explosion objects
+let explosions = [];
+
+class Explosion {
+    constructor(x, y, size) {
+        this.image = new Image()
+        this.image.src = './media/images/boom.png'
+
+        this.x = x;
+        this.y = y;
+        this.size = size;
+    }
+}
+
 
 function drawScore() {
     ctx.fillStyle = 'black';
