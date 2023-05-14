@@ -22,6 +22,9 @@ hitboxCanvas.height = window.innerHeight;
 
 let score = 0;
 ctx.font = '50px Impact'
+let lives = 5;
+let gameOver = false;
+
 
 
 let timeToNextRaven = 0;
@@ -82,6 +85,7 @@ class Raven {
 
     }
     
+    
     //moves the sprite
     update(deltaTime) {
         //prevvents ravens from leaving the page
@@ -110,6 +114,11 @@ class Raven {
             else this.animationFrame++;
             this.timeSinceFlap = 0;
         }
+        //lives
+        if (this.x < 0 - this.width) {
+            lives--
+        }
+        if (lives <= 0) gameOver = true;
         
     }
 
@@ -120,11 +129,59 @@ class Raven {
     }
 }
 
+//hold explosion objects
+let explosions = [];
+
+class Explosion {
+    constructor(x, y, size) {
+        this.image = new Image();
+        this.image.src = './media/images/boom.png';
+        this.spriteWidth = 200;
+        this.spriteHeight = 179;
+
+        this.x = x;
+        this.y = y;
+        this.size = size;
+        this.frame = 0;
+        this.sound = new Audio();
+        this.sound.src = './media/sfx/mutantdie.wav';
+
+        this.timeSinceLastFrame = 0;
+        this.frameInterval = 100;
+
+        this.markedForDeletion = false;
+    }
+
+    update(deltaTime) {
+        if (this.frame === 0) this.sound.play();
+
+        this.timeSinceLastFrame += deltaTime;
+        if (this.timeSinceLastFrame > this.frameInterval) {
+            this.frame++;
+            this.timeSinceLastFrame = 0;
+            if (this.frame > 5) this.markedForDeletion = true;
+        }
+
+    }
+
+    draw() {
+        ctx.drawImage(this.image, this.frame * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, this.x, this.y - this.size/5.5,this.size, this.size)
+    }
+}
+
+
 function drawScore() {
     ctx.fillStyle = 'black';
     ctx.fillText('Score: ' + score, 46, 74);
     ctx.fillStyle = 'white';
     ctx.fillText('Score: ' + score, 50, 75);
+}
+
+function drawLives() {
+    ctx.fillStyle = 'black';
+    ctx.fillText('Lives: ' + lives, 46, 124);
+    ctx.fillStyle = 'white';
+    ctx.fillText('Lives: ' + lives, 50, 125);
 }
 
 window.addEventListener('click', function (e) {
@@ -135,12 +192,12 @@ window.addEventListener('click', function (e) {
         if (obj.randColors[0] === pixelColor[0] &&
             obj.randColors[1] === pixelColor[1] &&
             obj.randColors[2] === pixelColor[2]) {
-            obj.markedForDeletion = true;
-            score++;
-            console.log('YOU HIT!')
+                obj.markedForDeletion = true;
+                score++;
+                explosions.push(new Explosion(obj.x, obj.y, obj.width));
+                console.log(explosions)
         }
     });
-    console.log('pixelColor: ' + pixelColor)
 });
 
 
@@ -165,14 +222,16 @@ function animate(timeStamp) {
     };
 
     drawScore();
+    drawLives();
 
     // [] <-- this is an array literal, the 3 dots are a spread operator. https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax 
-    [...ravens].forEach(obj => obj.update(deltaTime));
+    [...ravens, ...explosions].forEach(obj => obj.update(deltaTime));
     // we use this syntax to make a shallow copy of the ravens array, this array is not affected by changes made to 'ravens'
-    [...ravens].forEach(obj => obj.draw());
+    [...ravens, ...explosions].forEach(obj => obj.draw());
 
     //deletes ravens outside of screen it markedfordeletion evaluates to false (double negative statement)
     ravens = ravens.filter(obj => !obj.markedForDeletion);
+    explosions = explosions.filter(obj => !obj.markedForDeletion);
     requestAnimationFrame(animate);
     console.log(ravens.randColors)
 }
