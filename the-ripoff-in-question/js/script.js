@@ -22,7 +22,7 @@ hitboxCanvas.height = window.innerHeight;
 
 let score = 0;
 ctx.font = '50px Impact'
-let lives = 5;
+let lives = 1;
 let gameOver = false;
 
 
@@ -171,17 +171,38 @@ class Explosion {
 
 
 function drawScore() {
+
     ctx.fillStyle = 'black';
-    ctx.fillText('Score: ' + score, 46, 74);
+    ctx.fillText('Score: ' + score, canvas.width * 0.033, canvas.height * 0.0585 );
     ctx.fillStyle = 'white';
-    ctx.fillText('Score: ' + score, 50, 75);
+    ctx.fillText('Score: ' + score, canvas.width * 0.035, canvas.height * 0.06 );
 }
 
 function drawLives() {
     ctx.fillStyle = 'black';
-    ctx.fillText('Lives: ' + lives, 46, 124);
+    ctx.fillText('Lives: ' + lives, canvas.width * 0.033, canvas.height * 0.1185);
     ctx.fillStyle = 'white';
-    ctx.fillText('Lives: ' + lives, 50, 125);
+    ctx.fillText('Lives: ' + lives, canvas.width * 0.035, canvas.height * 0.12);
+}
+
+function drawGameOver() {
+    
+    ctx.textAlign = 'center'
+
+    ctx.fillStyle = 'grey'
+    ctx.fillRect(canvas.width * 0.00001, canvas.height * 0.00001, canvas.width, canvas.height)
+
+    ctx.fillStyle = 'black';
+    ctx.fillText('GAME OVER', canvas.width * 0.498 , canvas.height * 0.447)
+    ctx.fillStyle = 'white';
+    ctx.fillText('GAME OVER', canvas.width * 0.5, canvas.height * 0.45)
+    
+    ctx.fillStyle = 'black';
+    ctx.fillText('SCORE: ' + score, canvas.width * 0.498, canvas.height * 0.4975)
+    ctx.fillStyle = 'white';
+    ctx.fillText('SCORE: ' + score, canvas.width * 0.5, canvas.height * 0.5)
+
+
 }
 
 window.addEventListener('click', function (e) {
@@ -232,8 +253,9 @@ function animate(timeStamp) {
     //deletes ravens outside of screen it markedfordeletion evaluates to false (double negative statement)
     ravens = ravens.filter(obj => !obj.markedForDeletion);
     explosions = explosions.filter(obj => !obj.markedForDeletion);
-    requestAnimationFrame(animate);
-    console.log(ravens.randColors)
+
+    if (!gameOver) requestAnimationFrame(animate);
+    else drawGameOver();
 }
 
 animate(0)
