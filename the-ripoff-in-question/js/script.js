@@ -22,7 +22,7 @@ hitboxCanvas.height = window.innerHeight;
 
 let score = 0;
 ctx.font = '50px Impact'
-let lives = 1;
+let lives = 5;
 let gameOver = false;
 
 
@@ -202,12 +202,23 @@ function drawGameOver() {
     ctx.fillStyle = 'white';
     ctx.fillText('SCORE: ' + score, canvas.width * 0.5, canvas.height * 0.5)
 
+   
+}
 
+function gunshotSound() {
+  const pistolShotsArr = [
+    new Audio('./media/sfx/pistol.ogg'),
+    new Audio('./media/sfx/pistol2.ogg'),
+    new Audio('./media/sfx/pistol3.ogg')
+  ];
+  const randomIndex = Math.floor(Math.random() * pistolShotsArr.length);
+  const selectedShot = pistolShotsArr[randomIndex];
+  selectedShot.volume = 0.15;
+  selectedShot.play();
 }
 
 window.addEventListener('click', function (e) {
     const detectPixelColor = hitboxCtx.getImageData(e.x, e.y, 1, 1);
-    console.log(detectPixelColor);
     const pixelColor = detectPixelColor.data;
     ravens.forEach(obj => {
         if (obj.randColors[0] === pixelColor[0] &&
@@ -216,10 +227,12 @@ window.addEventListener('click', function (e) {
                 obj.markedForDeletion = true;
                 score++;
                 explosions.push(new Explosion(obj.x, obj.y, obj.width));
-                console.log(explosions)
         }
     });
+    if (!gameOver) gunshotSound()
+
 });
+
 
 
 //timeStamp value counted in milliseconds, used to base speed on the same value, no matter the PC power
