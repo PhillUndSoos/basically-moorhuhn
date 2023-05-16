@@ -8,7 +8,7 @@ body {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  cursor: crosshair;
+  cursor: url("../media/images/crosshair64.png") 32 32, auto;
 }
 
 canvas {
