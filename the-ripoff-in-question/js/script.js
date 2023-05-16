@@ -22,7 +22,7 @@ hitboxCanvas.height = window.innerHeight;
 
 let score = 0;
 ctx.font = '50px Impact'
-let lives = 1;
+let lives = 5;
 let gameOver = false;
 
 
@@ -229,7 +229,7 @@ window.addEventListener('click', function (e) {
                 explosions.push(new Explosion(obj.x, obj.y, obj.width));
         }
     });
-    gunshotSound()
+    if (!gameOver) gunshotSound()
 
 });
 
