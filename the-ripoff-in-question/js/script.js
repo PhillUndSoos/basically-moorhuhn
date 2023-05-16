@@ -21,17 +21,10 @@ function playGame(){
     hitboxCanvas.height = window.innerHeight;
 
 
-<<<<<<< Updated upstream
-let score = 0;
-ctx.font = '50px Impact'
-let lives = 1;
-let gameOver = false;
-=======
     let score = 0;
     ctx.font = '50px Impact'
     let lives = 5;
     let gameOver = false;
->>>>>>> Stashed changes
 
 
 
@@ -251,12 +244,6 @@ let gameOver = false;
         if (!gameOver) gunshotSound()
 
     });
-<<<<<<< Updated upstream
-    gunshotSound()
-
-});
-=======
->>>>>>> Stashed changes
 
 
 
@@ -296,6 +283,6 @@ let gameOver = false;
         else drawGameOver();
     }
 
-    animate(0)
+        animate(0)
 }
 playGame()
